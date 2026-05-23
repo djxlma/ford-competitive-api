@@ -21,7 +21,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/auth/**",
-                                "/vehicles/**"
+                                "/vehicles/**",
+                                "/searches/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
