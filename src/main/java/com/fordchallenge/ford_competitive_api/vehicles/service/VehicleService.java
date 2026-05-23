@@ -1,5 +1,9 @@
 package com.fordchallenge.ford_competitive_api.vehicles.service;
 
+import com.fordchallenge.ford_competitive_api.searches.entity.SearchHistory;
+import com.fordchallenge.ford_competitive_api.searches.repository.SearchHistoryRepository;
+import com.fordchallenge.ford_competitive_api.users.entity.User;
+import com.fordchallenge.ford_competitive_api.users.repository.UserRepository;
 import com.fordchallenge.ford_competitive_api.vehicles.dto.VehicleResponse;
 import com.fordchallenge.ford_competitive_api.vehicles.dto.VehicleSearchRequest;
 import com.fordchallenge.ford_competitive_api.vehicles.entity.Vehicle;
@@ -11,9 +15,17 @@ import org.springframework.stereotype.Service;
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
+    private final SearchHistoryRepository searchHistoryRepository;
+    private final UserRepository userRepository;
 
-    public VehicleService(VehicleRepository vehicleRepository) {
+    public VehicleService(
+            VehicleRepository vehicleRepository,
+            SearchHistoryRepository searchHistoryRepository,
+            UserRepository userRepository
+    ) {
         this.vehicleRepository = vehicleRepository;
+        this.searchHistoryRepository = searchHistoryRepository;
+        this.userRepository = userRepository;
     }
 
     public VehicleResponse searchVehicle(VehicleSearchRequest request) {
@@ -26,6 +38,8 @@ public class VehicleService {
                         request.versao()
                 )
                 .orElseGet(() -> createMockVehicle(request));
+
+        saveSearchHistory(request, vehicle);
 
         return mapToResponse(vehicle);
     }
@@ -52,6 +66,27 @@ public class VehicleService {
         vehicle.setSpecs(spec);
 
         return vehicleRepository.save(vehicle);
+    }
+
+    private void saveSearchHistory(
+            VehicleSearchRequest request,
+            Vehicle vehicle
+    ) {
+
+        User user = userRepository.findById(1L)
+                .orElse(null);
+
+        SearchHistory history = SearchHistory.builder()
+                .termoBusca(
+                        request.marca() + " "
+                                + request.modelo() + " "
+                                + request.versao()
+                )
+                .vehicle(vehicle)
+                .user(user)
+                .build();
+
+        searchHistoryRepository.save(history);
     }
 
     private VehicleResponse mapToResponse(Vehicle vehicle) {
