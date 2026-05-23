@@ -1,5 +1,7 @@
 package com.fordchallenge.ford_competitive_api.auth.controller;
 
+import com.fordchallenge.ford_competitive_api.auth.dto.AuthResponse;
+import com.fordchallenge.ford_competitive_api.auth.dto.LoginRequest;
 import com.fordchallenge.ford_competitive_api.auth.dto.RegisterRequest;
 import com.fordchallenge.ford_competitive_api.auth.service.AuthService;
 import com.fordchallenge.ford_competitive_api.users.entity.User;
@@ -22,5 +24,11 @@ public class AuthController {
     public User register(@RequestBody @Valid RegisterRequest request) {
 
         return authService.register(request);
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody @Valid LoginRequest request) {
+
+        return authService.login(request);
     }
 }

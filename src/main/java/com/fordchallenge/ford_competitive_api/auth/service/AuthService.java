@@ -1,6 +1,9 @@
 package com.fordchallenge.ford_competitive_api.auth.service;
 
+import com.fordchallenge.ford_competitive_api.auth.dto.AuthResponse;
+import com.fordchallenge.ford_competitive_api.auth.dto.LoginRequest;
 import com.fordchallenge.ford_competitive_api.auth.dto.RegisterRequest;
+import com.fordchallenge.ford_competitive_api.security.JwtService;
 import com.fordchallenge.ford_competitive_api.users.entity.User;
 import com.fordchallenge.ford_competitive_api.users.entity.UserRole;
 import com.fordchallenge.ford_competitive_api.users.repository.UserRepository;
@@ -12,13 +15,16 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public AuthService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public User register(RegisterRequest request) {
@@ -35,5 +41,24 @@ public class AuthService {
                 .build();
 
         return userRepository.save(user);
+    }
+
+    public AuthResponse login(LoginRequest request) {
+
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new RuntimeException("Credenciais inválidas"));
+
+        boolean passwordMatches = passwordEncoder.matches(
+                request.senha(),
+                user.getSenhaHash()
+        );
+
+        if (!passwordMatches) {
+            throw new RuntimeException("Credenciais inválidas");
+        }
+
+        String token = jwtService.generateToken(user);
+
+        return new AuthResponse(token, "Bearer");
     }
 }
