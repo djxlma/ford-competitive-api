@@ -11,6 +11,8 @@ import com.fordchallenge.ford_competitive_api.vehicles.entity.VehicleSpec;
 import com.fordchallenge.ford_competitive_api.vehicles.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class VehicleService {
 
@@ -26,6 +28,20 @@ public class VehicleService {
         this.vehicleRepository = vehicleRepository;
         this.searchHistoryRepository = searchHistoryRepository;
         this.userRepository = userRepository;
+    }
+
+    public List<VehicleResponse> findAll() {
+        return vehicleRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    public VehicleResponse findById(Long id) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
+
+        return mapToResponse(vehicle);
     }
 
     public VehicleResponse searchVehicle(VehicleSearchRequest request) {

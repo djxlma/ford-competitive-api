@@ -6,6 +6,8 @@ import com.fordchallenge.ford_competitive_api.vehicles.service.VehicleService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/vehicles")
 public class VehicleController {
@@ -14,6 +16,16 @@ public class VehicleController {
 
     public VehicleController(VehicleService vehicleService) {
         this.vehicleService = vehicleService;
+    }
+
+    @GetMapping
+    public List<VehicleResponse> findAll() {
+        return vehicleService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public VehicleResponse findById(@PathVariable Long id) {
+        return vehicleService.findById(id);
     }
 
     @PostMapping("/search")
