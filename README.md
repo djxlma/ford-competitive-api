@@ -1,4 +1,3 @@
-````md
 # Ford Competitive Intelligence API
 
 ## Disciplina
